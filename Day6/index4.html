@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Rock Paper Scissors</title>
+	<style>
+		:root {
+			--ink: #f3f6ff;
+			--muted: #9ba6ca;
+			--paper: #070d2b;
+			--panel: #0b1440;
+			--line: #263b81;
+			--coral: #ff4f9a;
+			--teal: #29e6ff;
+			--yellow: #f5d34f;
+			--violet: #704cff;
+			--shadow: 0 22px 70px rgba(0, 0, 0, .48), 0 0 32px rgba(67, 74, 255, .18);
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			min-height: 100vh;
+			margin: 0;
+			color: var(--ink);
+			background: #030719;
+			background-image: radial-gradient(circle at 50% 20%, rgba(56, 38, 180, .42), transparent 35%), radial-gradient(circle at 15% 85%, rgba(0, 183, 255, .16), transparent 30%), linear-gradient(135deg, #020617, #0a0e38 52%, #17072f);
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		main { width: min(1080px, calc(100% - 36px)); margin: auto; padding: 52px 0 38px; }
+
+		.topline { display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--teal); font: bold 11px Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; }
+		.topline span:last-child { color: var(--muted); letter-spacing: .1em; }
+		h1 { max-width: 700px; margin: 28px 0 12px; color: #ffffff; font-size: clamp(3.4rem, 9vw, 7rem); line-height: .84; letter-spacing: -.06em; font-weight: 900; text-shadow: 0 0 28px rgba(41, 230, 255, .2); }
+		.intro { max-width: 510px; margin: 0; color: var(--muted); font-size: 1.08rem; line-height: 1.6; }
+
+		.game-shell { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; margin-top: 48px; }
+		.play-panel, .score-panel { background: linear-gradient(145deg, rgba(12, 22, 70, .96), rgba(6, 12, 43, .96)); border: 1px solid var(--line); box-shadow: var(--shadow); }
+		.play-panel { padding: clamp(24px, 5vw, 46px); }
+		.score-panel { padding: 28px; }
+		.section-label { margin: 0 0 20px; color: var(--coral); font: bold 11px Arial, sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+		.status { min-height: 92px; margin: 0 0 28px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+		.status strong { display: block; margin-bottom: 8px; font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 500; }
+		.status p { margin: 0; color: var(--muted); line-height: 1.5; }
+		.move-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+		.move-button { min-height: 126px; padding: 16px 10px; color: var(--ink); background: rgba(9, 18, 58, .9); border: 1px solid var(--line); cursor: pointer; font: inherit; transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+		.move-button:hover, .move-button:focus-visible { transform: translateY(-5px); border-color: var(--teal); background: #101c62; box-shadow: 0 0 22px rgba(41, 230, 255, .25); outline: none; }
+		.move-button:disabled { cursor: wait; opacity: .55; transform: none; }
+		.move-icon { display: block; margin-bottom: 15px; color: var(--teal); font: bold 2.1rem Arial, sans-serif; }
+		.move-name { display: block; font-size: 1rem; }
+		.camera-box { margin-bottom: 28px; padding: 16px; background: rgba(3, 8, 31, .8); border: 1px solid var(--line); box-shadow: inset 0 0 22px rgba(41, 230, 255, .05); }
+		.camera-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+		.camera-toolbar strong { font: bold 11px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+		.camera-toggle { padding: 9px 12px; color: #030719; background: var(--teal); border: 0; cursor: pointer; font: bold 10px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; box-shadow: 0 0 16px rgba(41, 230, 255, .35); }
+		.camera-toggle:hover, .camera-toggle:focus-visible { background: white; outline: none; }
+		.camera-stage { position: relative; display: grid; place-items: center; min-height: 180px; overflow: hidden; background: #010313; }
+		.camera-stage video, .camera-stage canvas { display: block; width: 100%; height: 100%; min-height: 180px; object-fit: contain; background: #010313; transform: scaleX(-1); }
+		.camera-stage canvas { position: absolute; inset: 0; }
+		.camera-status { position: absolute; right: 10px; bottom: 10px; left: 10px; padding: 8px 10px; color: white; background: rgba(4, 8, 35, .84); border: 1px solid rgba(41, 230, 255, .3); font: 11px Arial, sans-serif; }
+		.camera-note { margin: 10px 0 0; color: var(--muted); font: 11px/1.45 Arial, sans-serif; }
+		.camera-scorebar { display: none; align-items: center; gap: 10px; margin-bottom: 14px; }
+		.camera-score { min-width: 92px; padding: 8px 12px; background: rgba(7, 13, 43, .9); border: 1px solid var(--line); border-left: 3px solid var(--teal); }
+		.camera-score:last-of-type { border-left-color: var(--coral); }
+		.camera-score span { display: block; color: var(--muted); font: bold 9px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+		.camera-score strong { display: block; margin-top: 2px; color: white; font: bold 1.35rem Arial, sans-serif; }
+		.camera-reset { margin-left: auto; padding: 10px 14px; color: #030719; background: var(--yellow); border: 0; cursor: pointer; font: bold 10px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; box-shadow: 0 0 15px rgba(245, 211, 79, .25); }
+		.camera-reset:hover, .camera-reset:focus-visible { background: white; outline: none; }
+		body.camera-open { overflow: hidden; }
+		body.camera-open .camera-box { position: fixed; z-index: 30; inset: 0; display: flex; flex-direction: column; margin: 0; padding: clamp(18px, 4vw, 44px); background: radial-gradient(circle at 50% 44%, rgba(41, 20, 147, .42), transparent 42%), #02061b; border: 0; }
+		body.camera-open .camera-toolbar { flex: 0 0 auto; color: white; }
+		body.camera-open .camera-toggle { background: var(--coral); }
+		body.camera-open .camera-scorebar { display: flex; flex: 0 0 auto; }
+		body.camera-open .camera-stage { flex: 1; min-height: 0; }
+		body.camera-open .camera-stage video, body.camera-open .camera-stage canvas { height: 100%; min-height: 0; }
+		body.camera-open .camera-note { flex: 0 0 auto; color: rgba(255,255,255,.7); }
+		.round-overlay { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(3, 5, 25, .68); backdrop-filter: blur(8px); }
+		.round-overlay[hidden] { display: none; }
+		.countdown-card, .result-card { width: min(460px, 100%); padding: clamp(28px, 6vw, 52px); text-align: center; background: linear-gradient(145deg, #111b5b, #080d32); border: 1px solid var(--violet); box-shadow: 0 0 40px rgba(112, 76, 255, .4), 0 28px 80px rgba(0,0,0,.5); }
+		.countdown-label { margin: 0; color: var(--coral); font: bold 11px Arial, sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+		.countdown-number { display: block; margin: 12px 0 0; color: var(--teal); font: bold clamp(5rem, 18vw, 9rem) Arial, sans-serif; line-height: .9; }
+		.result-card[hidden] { display: none; }
+		.result-card h2 { margin: 0 0 22px; font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 500; }
+		.result-moves { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+		.result-move { padding: 18px 10px; background: #070d2b; border: 1px solid var(--line); border-left: 4px solid var(--teal); }
+		.result-move:last-child { border-left-color: var(--coral); }
+		.result-move span { display: block; color: var(--muted); font: bold 10px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+		.result-emoji { display: block; margin: 8px 0; font-size: 3.3rem; }
+		.result-move strong { font-size: 1.05rem; font-weight: 500; }
+		.result-message { margin: 22px 0 0; color: var(--teal); font-size: 1.35rem; }
+		.continue-button { margin-top: 24px; padding: 12px 18px; color: white; background: var(--teal); border: 0; cursor: pointer; font: bold 11px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+		.continue-button:hover, .continue-button:focus-visible { background: var(--ink); outline: none; }
+		.confetti-layer { position: fixed; z-index: 50; inset: 0; overflow: hidden; pointer-events: none; }
+		.confetti { position: absolute; top: -24px; left: var(--x); width: 10px; height: 18px; background: var(--color); animation: fall var(--duration) linear var(--delay) forwards; transform: rotate(var(--rotation)); }
+		@keyframes fall { to { translate: var(--drift) 110vh; rotate: 620deg; } }
+		.scoreboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 30px; }
+		.score { padding: 18px; background: #070d2b; border: 1px solid var(--line); border-left: 4px solid var(--teal); box-shadow: inset 0 0 18px rgba(41, 230, 255, .05); }
+		.score:last-child { border-left-color: var(--coral); }
+		.score span { display: block; color: var(--muted); font: bold 10px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+		.score strong { display: block; margin-top: 5px; font-size: 3rem; font-weight: 500; }
+		.round-title { margin: 0 0 14px; font-size: 1.35rem; font-weight: 500; }
+		.rounds { display: grid; gap: 10px; max-height: 240px; overflow: auto; margin: 0; padding: 0; list-style: none; }
+		.rounds li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--muted); font: 12px Arial, sans-serif; }
+		.rounds b { color: var(--ink); font-weight: bold; }
+		.empty { color: var(--muted); font: 13px Arial, sans-serif; }
+		.reset { width: 100%; margin-top: 26px; padding: 13px 16px; color: #030719; background: var(--yellow); border: 0; cursor: pointer; font: bold 11px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+		.reset:hover, .reset:focus-visible { background: white; box-shadow: 0 0 18px rgba(245, 211, 79, .45); transform: translateY(-2px); outline: none; }
+		footer { margin-top: 24px; color: var(--muted); font: 11px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+
+		@media (max-width: 720px) {
+			main { padding-top: 34px; }
+			.topline span:last-child { display: none; }
+			.game-shell { grid-template-columns: 1fr; margin-top: 36px; }
+			.score-panel { order: -1; }
+		}
+
+		@media (max-width: 430px) {
+			main { width: min(100% - 24px, 1080px); }
+			.move-list { grid-template-columns: 1fr; }
+			.move-button { min-height: 78px; text-align: left; }
+			.move-icon { display: inline-block; width: 42px; margin: 0 8px 0 0; }
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<div class="topline"><span>Day 06 / Mini game</span><span>Best of every round</span></div>
+		<h1>Make your move.</h1>
+		<p class="intro">Choose rock, paper, or scissors. The computer will answer after a short pause, then the scoreboard will keep track of the match.</p>
+
+		<section class="game-shell" aria-label="Rock Paper Scissors game">
+			<div class="play-panel">
+				<p class="section-label">Your move</p>
+				<div class="camera-box">
+					<div class="camera-toolbar"><strong>Camera mode</strong><button class="camera-toggle" id="camera-toggle" type="button">Start camera</button></div>
+					<div class="camera-scorebar" aria-label="Camera match score">
+						<div class="camera-score"><span>You</span><strong id="camera-player-score">0</strong></div>
+						<div class="camera-score"><span>Computer</span><strong id="camera-computer-score">0</strong></div>
+						<button class="camera-reset" id="camera-reset" type="button">Reset</button>
+					</div>
+					<div class="camera-stage">
+						<video id="camera-video" autoplay playsinline muted></video>
+						<canvas id="camera-canvas"></canvas>
+						<div class="camera-status" id="camera-status">Camera is off. Use the buttons below or start camera mode.</div>
+					</div>
+					<p class="camera-note">Hold a fist for rock, an open hand for paper, or two fingers for scissors.</p>
+				</div>
+				<div class="status" aria-live="polite">
+					<strong id="result-title">Ready when you are.</strong>
+					<p id="result-detail">Pick one of the three moves to start the round.</p>
+				</div>
+				<div class="move-list">
+					<button class="move-button" type="button" data-move="rock"><span class="move-icon">R</span><span class="move-name">Rock</span></button>
+					<button class="move-button" type="button" data-move="paper"><span class="move-icon">P</span><span class="move-name">Paper</span></button>
+					<button class="move-button" type="button" data-move="scissors"><span class="move-icon">S</span><span class="move-name">Scissors</span></button>
+				</div>
+			</div>
+
+			<aside class="score-panel">
+				<p class="section-label">Match score</p>
+				<div class="scoreboard">
+					<div class="score"><span>You</span><strong id="player-score">0</strong></div>
+					<div class="score"><span>Computer</span><strong id="computer-score">0</strong></div>
+				</div>
+				<h2 class="round-title">Round history</h2>
+				<ul class="rounds" id="round-history"><li class="empty">No rounds played yet.</li></ul>
+				<button class="reset" id="reset-button" type="button">Reset match</button>
+			</aside>
+		</section>
+		<footer>First to 5 wins the match</footer>
+	</main>
+	<div class="round-overlay" id="round-overlay" hidden aria-live="assertive">
+		<div class="countdown-card" id="countdown-card">
+			<p class="countdown-label" id="countdown-label">Round 1</p>
+			<strong class="countdown-number" id="countdown-number">3</strong>
+		</div>
+		<div class="result-card" id="result-card" hidden>
+			<h2 id="popup-result">You win!</h2>
+			<div class="result-moves">
+				<div class="result-move"><span>You played</span><span class="result-emoji" id="player-emoji">✌</span><strong id="popup-player-move">Scissors</strong></div>
+				<div class="result-move"><span>Computer played</span><span class="result-emoji" id="computer-emoji">✊</span><strong id="popup-computer-move">Rock</strong></div>
+			</div>
+			<p class="result-message" id="popup-message">Nice round.</p>
+		</div>
+	</div>
+	<div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
+
+	<script>
+		const moves = ["rock", "paper", "scissors"];
+		const beats = { rock: "scissors", paper: "rock", scissors: "paper" };
+		const labels = { rock: "Rock", paper: "Paper", scissors: "Scissors" };
+		const emojis = { rock: "✊", paper: "✋", scissors: "✌" };
+		const handConnections = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [17, 18], [18, 19], [19, 20], [0, 17]];
+		const state = { playerScore: 0, computerScore: 0, rounds: [], waiting: false, cameraRound: false, cameraActive: false, cameraArmed: true, stableMove: "", stableFrames: 0, neutralFrames: 0 };
+		const resultTitle = document.querySelector("#result-title");
+		const resultDetail = document.querySelector("#result-detail");
+		const playerScore = document.querySelector("#player-score");
+		const computerScore = document.querySelector("#computer-score");
+		const history = document.querySelector("#round-history");
+		const moveButtons = document.querySelectorAll(".move-button");
+		const cameraToggle = document.querySelector("#camera-toggle");
+		const cameraVideo = document.querySelector("#camera-video");
+		const cameraCanvas = document.querySelector("#camera-canvas");
+		const cameraStatus = document.querySelector("#camera-status");
+		const cameraContext = cameraCanvas.getContext("2d");
+		const cameraPlayerScore = document.querySelector("#camera-player-score");
+		const cameraComputerScore = document.querySelector("#camera-computer-score");
+		const roundOverlay = document.querySelector("#round-overlay");
+		const countdownCard = document.querySelector("#countdown-card");
+		const countdownLabel = document.querySelector("#countdown-label");
+		const countdownNumber = document.querySelector("#countdown-number");
+		const resultCard = document.querySelector("#result-card");
+		const popupResult = document.querySelector("#popup-result");
+		const playerEmoji = document.querySelector("#player-emoji");
+		const computerEmoji = document.querySelector("#computer-emoji");
+		const popupPlayerMove = document.querySelector("#popup-player-move");
+		const popupComputerMove = document.querySelector("#popup-computer-move");
+		const popupMessage = document.querySelector("#popup-message");
+		const confettiLayer = document.querySelector("#confetti-layer");
+		let handTracker;
+		let cameraFrame;
+		let countdownTimer;
+		let resultTimer;
+
+		function computerMove() {
+			return moves[Math.floor(Math.random() * moves.length)];
+		}
+
+		function renderHistory() {
+			if (!state.rounds.length) {
+				history.innerHTML = '<li class="empty">No rounds played yet.</li>';
+				return;
+			}
+			history.innerHTML = state.rounds.map((round, index) => (
+				`<li><span>Round ${index + 1}: ${labels[round.player]} / ${labels[round.computer]}</span><b>${round.result}</b></li>`
+			)).reverse().join("");
+		}
+
+		function launchConfetti() {
+			const colors = ["#e7674f", "#23747a", "#f2c45d", "#19232c", "#f7f5ef"];
+			confettiLayer.innerHTML = Array.from({ length: 70 }, (_, index) => {
+				const style = `--x:${Math.random() * 100}vw;--drift:${(Math.random() - .5) * 35}vw;--color:${colors[index % colors.length]};--duration:${2 + Math.random() * 1.8}s;--delay:${Math.random() * .25}s;--rotation:${Math.random() * 180}deg`;
+				return `<i class="confetti" style="${style}"></i>`;
+			}).join("");
+			window.setTimeout(() => { confettiLayer.innerHTML = ""; }, 4200);
+		}
+
+		function showRoundResult(playerMove, opponentMove, result) {
+			popupResult.textContent = result === "You win" ? "You win!" : result === "Computer wins" ? "Computer wins" : "Draw round";
+			popupResult.style.color = result === "You win" ? "var(--teal)" : result === "Computer wins" ? "var(--coral)" : "var(--ink)";
+			playerEmoji.textContent = emojis[playerMove];
+			computerEmoji.textContent = emojis[opponentMove];
+			popupPlayerMove.textContent = labels[playerMove];
+			popupComputerMove.textContent = labels[opponentMove];
+			popupMessage.textContent = result === "You win" ? "Great read. Keep that momentum." : result === "Computer wins" ? "The computer got this one." : "A perfectly matched round.";
+			countdownCard.hidden = true;
+			resultCard.hidden = false;
+			if (result === "You win") launchConfetti();
+			window.clearTimeout(resultTimer);
+			resultTimer = window.setTimeout(closeRoundOverlay, 1800);
+		}
+
+		function closeRoundOverlay() {
+			window.clearInterval(countdownTimer);
+			window.clearTimeout(resultTimer);
+			roundOverlay.hidden = true;
+			countdownCard.hidden = false;
+			resultCard.hidden = true;
+			state.cameraArmed = false;
+			state.stableMove = "";
+			state.stableFrames = 0;
+		}
+
+		function drawHandOverlay(landmarks) {
+			cameraContext.save();
+			cameraContext.lineWidth = Math.max(3, cameraCanvas.width / 220);
+			cameraContext.lineCap = "round";
+			cameraContext.lineJoin = "round";
+			cameraContext.strokeStyle = "#f5d34f";
+			handConnections.forEach(([start, end]) => {
+				cameraContext.beginPath();
+				cameraContext.moveTo(landmarks[start].x * cameraCanvas.width, landmarks[start].y * cameraCanvas.height);
+				cameraContext.lineTo(landmarks[end].x * cameraCanvas.width, landmarks[end].y * cameraCanvas.height);
+				cameraContext.stroke();
+			});
+			landmarks.forEach((point) => {
+				cameraContext.beginPath();
+				cameraContext.fillStyle = "#fff6a8";
+				cameraContext.strokeStyle = "#ff4f9a";
+				cameraContext.lineWidth = 2;
+				cameraContext.arc(point.x * cameraCanvas.width, point.y * cameraCanvas.height, Math.max(4, cameraCanvas.width / 180), 0, Math.PI * 2);
+				cameraContext.fill();
+				cameraContext.stroke();
+			});
+			cameraContext.restore();
+		}
+
+		function finishRound(playerMove) {
+			const opponentMove = computerMove();
+			let result;
+
+			if (playerMove === opponentMove) {
+				result = "Draw";
+				resultTitle.textContent = "A tidy draw.";
+			} else if (beats[playerMove] === opponentMove) {
+				result = "You win";
+				state.playerScore += 1;
+				resultTitle.textContent = "You win the round.";
+			} else {
+				result = "Computer wins";
+				state.computerScore += 1;
+				resultTitle.textContent = "The computer takes it.";
+			}
+
+			state.rounds.push({ player: playerMove, computer: opponentMove, result });
+			playerScore.textContent = state.playerScore;
+			computerScore.textContent = state.computerScore;
+			cameraPlayerScore.textContent = state.playerScore;
+			cameraComputerScore.textContent = state.computerScore;
+			resultDetail.textContent = `You played ${labels[playerMove]}. The computer played ${labels[opponentMove]}.`;
+			renderHistory();
+			state.waiting = false;
+			if (state.cameraRound) {
+				state.cameraRound = false;
+				showRoundResult(playerMove, opponentMove, result);
+			}
+			moveButtons.forEach((button) => { button.disabled = false; });
+		}
+
+		function playMove(playerMove) {
+			if (state.waiting) return;
+			state.waiting = true;
+			moveButtons.forEach((button) => { button.disabled = true; });
+			resultTitle.textContent = "The computer is choosing...";
+			resultDetail.textContent = `Your move: ${labels[playerMove]}.`;
+			window.setTimeout(() => finishRound(playerMove), 700);
+		}
+
+		function playRound(event) {
+			playMove(event.currentTarget.dataset.move);
+		}
+
+		function beginCameraRound(playerMove) {
+			if (state.waiting || !roundOverlay.hidden) return;
+			state.waiting = true;
+			state.cameraRound = true;
+			state.cameraArmed = false;
+			moveButtons.forEach((button) => { button.disabled = true; });
+			countdownLabel.textContent = `Round ${state.rounds.length + 1}`;
+			countdownNumber.textContent = "3";
+			countdownCard.hidden = false;
+			resultCard.hidden = true;
+			roundOverlay.hidden = false;
+			let count = 3;
+			window.clearInterval(countdownTimer);
+			countdownTimer = window.setInterval(() => {
+				count -= 1;
+				if (count > 0) {
+					countdownNumber.textContent = String(count);
+					return;
+				}
+				window.clearInterval(countdownTimer);
+				finishRound(playerMove);
+			}, 800);
+		}
+
+		function classifyHand(landmarks) {
+			const fingers = [[5, 6, 8], [9, 10, 12], [13, 14, 16], [17, 18, 20]];
+			const palmPoints = [0, 5, 9, 13, 17].map((index) => landmarks[index]);
+			const palmCenter = palmPoints.reduce((center, point) => ({
+				x: center.x + point.x / palmPoints.length,
+				y: center.y + point.y / palmPoints.length,
+				z: center.z + (point.z || 0) / palmPoints.length
+			}), { x: 0, y: 0, z: 0 });
+			const distance = (first, second) => Math.hypot(first.x - second.x, first.y - second.y, (first.z || 0) - (second.z || 0));
+			const angle = (first, vertex, last) => {
+				const firstVector = { x: first.x - vertex.x, y: first.y - vertex.y, z: (first.z || 0) - (vertex.z || 0) };
+				const lastVector = { x: last.x - vertex.x, y: last.y - vertex.y, z: (last.z || 0) - (vertex.z || 0) };
+				const dot = firstVector.x * lastVector.x + firstVector.y * lastVector.y + firstVector.z * lastVector.z;
+				const size = Math.hypot(firstVector.x, firstVector.y, firstVector.z) * Math.hypot(lastVector.x, lastVector.y, lastVector.z);
+				return size ? Math.acos(Math.max(-1, Math.min(1, dot / size))) * 180 / Math.PI : 0;
+			};
+			const extended = fingers.map(([mcp, pip, tip]) => {
+				const straight = angle(landmarks[mcp], landmarks[pip], landmarks[tip]) > 125;
+				const reachesOut = distance(landmarks[tip], palmCenter) > distance(landmarks[pip], palmCenter) * 1.12;
+				return straight && reachesOut;
+			});
+			const extendedCount = extended.filter(Boolean).length;
+
+			if (extendedCount === 0) return "rock";
+			if (extendedCount >= 4) return "paper";
+			if (extended[0] && extended[1] && !extended[2] && !extended[3]) return "scissors";
+			return "";
+		}
+
+		function handleHandResults(results) {
+			if (cameraVideo.videoWidth && cameraCanvas.width !== cameraVideo.videoWidth) {
+				cameraCanvas.width = cameraVideo.videoWidth;
+				cameraCanvas.height = cameraVideo.videoHeight;
+			}
+			cameraContext.save();
+			cameraContext.clearRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+			cameraContext.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+			const detectedHands = results.landmarks || [];
+			if (!detectedHands.length) {
+				state.stableMove = "";
+				state.stableFrames = 0;
+				state.neutralFrames += 1;
+				if (state.neutralFrames > 24) state.cameraArmed = true;
+				cameraStatus.textContent = "Show one hand to choose a move.";
+				cameraContext.restore();
+				return;
+			}
+
+			const landmarks = detectedHands[0];
+			drawHandOverlay(landmarks);
+			const detectedMove = classifyHand(landmarks);
+			state.neutralFrames = 0;
+			if (!detectedMove) {
+				cameraStatus.textContent = "Try a fist, open hand, or two fingers.";
+				cameraContext.restore();
+				return;
+			}
+
+			if (detectedMove === state.stableMove) state.stableFrames += 1;
+			else { state.stableMove = detectedMove; state.stableFrames = 1; }
+			cameraStatus.textContent = `${labels[detectedMove]} detected. Hold steady...`;
+			if (state.cameraArmed && state.stableFrames >= 8 && !state.waiting) {
+				state.cameraArmed = false;
+				cameraStatus.textContent = `Playing ${labels[detectedMove]}.`;
+				beginCameraRound(detectedMove);
+			}
+			cameraContext.restore();
+		}
+
+		async function startCamera() {
+			if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+				cameraStatus.textContent = "Camera access requires a secure browser page.";
+				return;
+			}
+			try {
+				const { FilesetResolver, HandLandmarker } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs");
+				const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
+				handTracker = await HandLandmarker.createFromOptions(vision, {
+					baseOptions: { modelAssetPath: new URL("hand_landmarker.task", window.location.href).href, delegate: "GPU" },
+					runningMode: "VIDEO",
+					numHands: 1,
+					minHandDetectionConfidence: .7,
+					minHandPresenceConfidence: .7,
+					minTrackingConfidence: .7
+				});
+				cameraVideo.srcObject = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
+				await cameraVideo.play();
+				state.cameraActive = true;
+				state.cameraArmed = true;
+				state.stableMove = "";
+				state.stableFrames = 0;
+				document.body.classList.add("camera-open");
+				cameraToggle.textContent = "Stop camera";
+				cameraStatus.textContent = "Camera ready. Show one hand to play.";
+				processCameraFrame();
+			} catch (error) {
+				cameraStatus.textContent = "Camera or local hand model could not load. Use the buttons below.";
+			}
+		}
+
+		function processCameraFrame() {
+			if (!state.cameraActive || !handTracker) return;
+			if (cameraVideo.readyState < 2 || !cameraVideo.videoWidth || !cameraVideo.videoHeight) {
+				cameraFrame = window.requestAnimationFrame(processCameraFrame);
+				return;
+			}
+			try {
+				const results = handTracker.detectForVideo(cameraVideo, performance.now());
+				handleHandResults(results);
+			} catch (error) {
+				cameraStatus.textContent = "Camera is warming up. Hold still for a moment.";
+			}
+			cameraFrame = window.requestAnimationFrame(processCameraFrame);
+		}
+
+		function stopCamera() {
+			if (cameraFrame) window.cancelAnimationFrame(cameraFrame);
+			window.clearInterval(countdownTimer);
+			if (cameraVideo.srcObject) cameraVideo.srcObject.getTracks().forEach((track) => track.stop());
+			cameraVideo.srcObject = null;
+			if (handTracker) handTracker.close();
+			handTracker = null;
+			cameraContext.clearRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+			state.cameraActive = false;
+			state.waiting = false;
+			state.cameraRound = false;
+			document.body.classList.remove("camera-open");
+			closeRoundOverlay();
+			cameraToggle.textContent = "Start camera";
+			cameraStatus.textContent = "Camera is off. Use the buttons below or start camera mode.";
+		}
+
+		function resetMatch() {
+			state.playerScore = 0;
+			state.computerScore = 0;
+			state.rounds = [];
+			state.waiting = false;
+			state.cameraRound = false;
+			state.cameraArmed = true;
+			playerScore.textContent = "0";
+			computerScore.textContent = "0";
+			cameraPlayerScore.textContent = "0";
+			cameraComputerScore.textContent = "0";
+			resultTitle.textContent = "Ready when you are.";
+			resultDetail.textContent = "Pick one of the three moves to start the round.";
+			moveButtons.forEach((button) => { button.disabled = false; });
+			renderHistory();
+			closeRoundOverlay();
+			state.cameraArmed = true;
+			confettiLayer.innerHTML = "";
+		}
+
+		moveButtons.forEach((button) => button.addEventListener("click", playRound));
+		document.querySelector("#reset-button").addEventListener("click", resetMatch);
+		document.querySelector("#camera-reset").addEventListener("click", resetMatch);
+		cameraToggle.addEventListener("click", () => state.cameraActive ? stopCamera() : startCamera());
+	</script>
+</body>
+</html>
