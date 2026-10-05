@@ -27,16 +27,17 @@ def page_shell(title: str, body: str) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{escape(title)}</title>
     <style>
-        :root {{ --ink: #20231f; --muted: #687269; --paper: #fffdf9; --cream: #f7f4ed; --sage: #dce5d5; --tomato: #e6583d; }}
+        :root {{ --ink: #17242b; --muted: #536b70; --paper: #f8fbf7; --cream: #e7f0ee; --sage: #a9d2c5; --tomato: #ef684f; --teal: #28666e; }}
         * {{ box-sizing: border-box; }}
-        body {{ margin: 0; min-height: 100vh; color: var(--ink); background: var(--cream); font-family: Georgia, "Times New Roman", serif; }}
+        body {{ margin: 0; min-height: 100vh; color: var(--ink); background: var(--cream); background-image: linear-gradient(rgba(40,102,110,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(40,102,110,.06) 1px, transparent 1px); background-size: 42px 42px; font-family: Georgia, "Times New Roman", serif; }}
+        body::before {{ content: ""; position: fixed; z-index: -1; width: 420px; height: 420px; top: -160px; right: -120px; border: 1px solid rgba(40,102,110,.24); border-radius: 50%; box-shadow: 0 0 0 26px rgba(40,102,110,.07), 0 0 0 52px rgba(40,102,110,.04); }}
         main {{ width: min(1080px, calc(100% - 36px)); margin: auto; padding: 68px 0; }}
-        .eyebrow {{ color: #b83e2e; font: bold 11px Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; }}
+        .eyebrow {{ color: var(--teal); font: bold 11px Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; }}
         h1 {{ margin: 12px 0 10px; font-size: clamp(3rem, 8vw, 6.5rem); line-height: .88; letter-spacing: -.06em; font-weight: 500; }}
         .intro {{ max-width: 560px; color: var(--muted); line-height: 1.6; }}
         .menu {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 42px 0 30px; }}
-        .item {{ display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 20px; color: var(--ink); background: var(--paper); border-left: 4px solid var(--sage); text-decoration: none; box-shadow: 0 8px 22px rgba(59,45,29,.07); transition: transform .2s, border-color .2s, box-shadow .2s; }}
-        .item:hover {{ transform: translateY(-4px); border-color: var(--tomato); box-shadow: 0 15px 30px rgba(59,45,29,.13); }}
+        .item {{ display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 20px; color: var(--ink); background: var(--paper); border-left: 4px solid var(--sage); text-decoration: none; box-shadow: 0 8px 22px rgba(23,36,43,.1); transition: transform .2s, border-color .2s, box-shadow .2s; }}
+        .item:hover {{ transform: translateY(-4px); border-color: var(--tomato); box-shadow: 0 15px 30px rgba(23,36,43,.18); }}
         .item strong {{ font-size: 1.1rem; font-weight: 500; }}
         .item span {{ color: var(--tomato); font: 21px Arial, sans-serif; }}
         .back {{ color: var(--muted); font: bold 12px Arial, sans-serif; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }}
