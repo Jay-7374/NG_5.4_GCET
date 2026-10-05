@@ -1,16 +1,22 @@
 from html import escape
 from pathlib import Path
 import shutil
+from urllib.parse import quote
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "_site"
+EXCLUDED_DIRS = {".git", ".github", ".vscode", "_site", "scripts"}
 GENERATED_FILES = {"index.html", "menu.html", "index-example.html"}
 
 
 def display_name(path: Path) -> str:
     name = path.stem.replace("_", " ").replace("-", " ")
     return " ".join(part.capitalize() for part in name.split())
+
+
+def url_name(name: str) -> str:
+    return quote(name, safe="")
 
 
 def page_shell(title: str, body: str) -> str:
@@ -49,7 +55,7 @@ def folder_menu(folder: Path, html_files: list[Path]) -> None:
         if source.name.lower() == "index.html":
             target = "index-example.html"
         links.append(
-            f'<a class="item" href="{escape(target)}">'
+            f'<a class="item" href="{escape(url_name(target))}">'
             f'<strong>{escape(display_name(source))}</strong><span>&rarr;</span></a>'
         )
     body = (
@@ -60,7 +66,9 @@ def folder_menu(folder: Path, html_files: list[Path]) -> None:
         + "".join(links)
         + '</nav><a class="back" href="../index.html">&larr; Back to Main Menu</a>'
     )
-    (SITE / folder.name / "index.html").write_text(
+    output = SITE / folder.name / "index.html"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
         page_shell(f"{display_name(folder)} | Training Menu", body), encoding="utf-8"
     )
 
@@ -69,7 +77,7 @@ def root_menu(folders: list[Path]) -> None:
     links = []
     for folder in folders:
         links.append(
-            f'<a class="item" href="{escape(folder.name)}/index.html">'
+            f'<a class="item" href="{escape(url_name(folder.name))}/index.html">'
             f'<strong>{escape(display_name(folder))}</strong><span>&rarr;</span></a>'
         )
     body = (
@@ -87,24 +95,34 @@ def root_menu(folders: list[Path]) -> None:
 
 def main() -> None:
     if SITE.exists():
-        shutil.rmtree(SITE)
-    SITE.mkdir()
-    excluded = {".git", ".github", ".vscode", "_site", "scripts"}
-    shutil.copytree(ROOT, SITE, dirs_exist_ok=True, ignore=shutil.ignore_patterns(*excluded))
+        if SITE.is_dir():
+            shutil.rmtree(SITE)
+        else:
+            SITE.unlink()
+    SITE.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(ROOT, SITE, dirs_exist_ok=True,
+                    ignore=shutil.ignore_patterns(*EXCLUDED_DIRS))
 
     folders = sorted(
-        path for path in ROOT.iterdir() if path.is_dir() and not path.name.startswith(".") and path.name not in excluded
+        path for path in ROOT.iterdir()
+        if path.is_dir() and not path.name.startswith(".") and path.name not in EXCLUDED_DIRS
     )
     for folder in folders:
         output_folder = SITE / folder.name
         source_index = folder / "index.html"
-        if source_index.exists():
+        if source_index.is_file():
             shutil.copy2(source_index, output_folder / "index-example.html")
         html_files = sorted(
-            path for path in folder.glob("*.html") if path.name.lower() not in GENERATED_FILES
+            path for path in folder.iterdir()
+            if path.is_file() and path.suffix.lower() == ".html" and path.name.lower() not in GENERATED_FILES
         )
         folder_menu(folder, html_files)
     root_menu(folders)
+    print(f"Generated {_site_summary(folders)}")
+
+
+def _site_summary(folders: list[Path]) -> str:
+    return f"site for {len(folders)} folder(s) at {SITE}"
 
 
 if __name__ == "__main__":
