@@ -67,18 +67,18 @@ def folder_menu(folder: Path, html_files: list[Path]) -> None:
         + "".join(links)
         + '</nav><a class="back" href="../index.html">&larr; Back to Main Menu</a>'
     )
-    output = SITE / folder.name / "index.html"
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        page_shell(f"{display_name(folder)} | Training Menu", body), encoding="utf-8"
-    )
+    output_folder = SITE / folder.name
+    output_folder.mkdir(parents=True, exist_ok=True)
+    generated_menu = page_shell(f"{display_name(folder)} | Training Menu", body)
+    for output_name in ("index.html", "menu.html"):
+        (output_folder / output_name).write_text(generated_menu, encoding="utf-8")
 
 
 def root_menu(folders: list[Path]) -> None:
     links = []
     for folder in folders:
         links.append(
-            f'<a class="item" href="{escape(url_name(folder.name))}/index.html">'
+            f'<a class="item" href="{escape(url_name(folder.name))}/menu.html">'
             f'<strong>{escape(display_name(folder))}</strong><span>&rarr;</span></a>'
         )
     body = (
