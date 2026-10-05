@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Simple Calculator</h1>
+    <input type="text" id="text1" placeholder="Enter First number"/>
+    <input type="text" id="operator" placeholder="Enter operator (+, -, *, /)"/>
+    <input type="text" id="text2" placeholder="Enter Second number"/>
+    <button onclick="addNumber()">Calculate</button>
+    <h2 id="res"></h2>
+    <script>
+        function addNumber(){
+            let firstNum = parseInt(document.getElementById("text1").value);
+            let secondNum = parseInt(document.getElementById("text2").value);
+            let op = document.getElementById("operator").value;
+            let result;
+
+            if(op == "+"){
+                result = firstNum + secondNum;
+            }
+            else if(op == "-"){
+                result = firstNum - secondNum;
+            }
+            else if(op == "*"){
+                result = firstNum * secondNum;
+            }
+            else if(op == "/"){
+                result = firstNum / secondNum;
+            }
+            else{
+                result = "Invalid operator";
+            }
+
+            document.getElementById("res").textContent = "result: " + result;
+        }
+    </script>
+</body>
+</html>

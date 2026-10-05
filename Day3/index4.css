@@ -1,0 +1,30 @@
+/* Universal Selector  */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Element Selector */
+h1 {
+    color: blue;
+
+}
+
+/* Class Selector */
+.student {
+    color: red;
+    font-size: 30px;
+}
+
+/* ID Selector */
+#special {
+    background-color: orange;
+    font-size: 20px;
+}
+
+/* Group Selector */
+
+h1,#special,h2 {
+text-align: center;
+}

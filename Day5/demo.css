@@ -1,0 +1,61 @@
+#maincontainer{
+    text-align: center;
+    background-color: aquamarine;
+    padding: 40px;
+}
+
+#countercontainer{
+    margin-bottom: 30px;
+    font-size: 30px;
+    font-family: fantasy;
+}
+
+#buttoncontainer{
+    padding: 5px;
+}
+
+
+
+#increment{
+    background-color: greenyellow;
+    border: 3px solid black;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#increment:hover{
+    transform: scale(1.2);
+    box-shadow: 0 0 15px grey;
+
+}
+
+#decrement{
+    background-color: magenta;
+    border: 3px solid black;
+    padding: 10px 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#decrement:hover{
+    transform: scale(1.2);
+    box-shadow: 0 0 15px grey;
+}
+
+#reset{
+    background-color: red;
+    border: 3px solid black;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-left: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#reset:hover{
+    transform: scale(1.2);
+    box-shadow: 0 0 15px grey;
+}

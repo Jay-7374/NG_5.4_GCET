@@ -1,0 +1,38 @@
+.card{
+    /* height: 200px; */
+    width: 200px;
+    border: 2px solid black;
+    padding: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+img{
+    width: 100%;
+}
+
+h3{
+    background-color: orange;
+    padding: 10px;
+}
+
+button{
+    background-color: green;
+    width: 100%;
+    padding:10px;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.card:hover{
+    transform: scale(1.2);
+    box-shadow: 0 0 15px grey;
+}
+
+.container
+{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    flex-direction: column reverse;
+}

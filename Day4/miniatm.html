@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MINI ATM</title>
+    </head>
+    <body>
+        <h1 id="mainheading">MINI ATM</h1>
+        <input type="text" id="useramount" placeholder="Enter your amount">
+        <br><br>
+        <button id="searchbtn" onclick="checkBalance()">CheckBalance</button>
+        <button id="depositbtn" onclick="deposit()">Deposit</button>
+        <button id="withdrawbtn" onclick="withdraw()">Withdraw</button>
+
+        <p id="result"></p>
+    </body>
+    <script>
+        let Balance = 10000;let ptag = document.getElementById("result");
+
+        function checkBalance(){
+            ptag.textContent = "Your balance is " + Balance;
+        }
+
+        function deposit(){
+            let useramount = document.getElementById("useramount").value;
+            Balance += parseInt(useramount);
+            ptag.textContent = "Success! You deposited " + useramount + " to your account.";
+
+        }
+
+        function withdraw(){
+            if(Balance >= parseInt(useramount.value) && parseInt(useramount.value) != 0){
+
+            ptag.textContent = "Successfully credited " + useramount.value + " from your account.";
+            Balance -= parseInt(useramount.value);
+            }
+            else{
+            ptag.textContent = "Invalid amount. Please try again.";
+            }
+        }
+    </script>
+</html>

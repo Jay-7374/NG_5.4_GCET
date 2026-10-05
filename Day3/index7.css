@@ -1,0 +1,44 @@
+.container{
+    display: flex;
+    /* justify-content: end; */
+    /* justify-content: center; */
+    justify-content: space-around;
+    flex-wrap: wrap;
+    flex-wrap: wrap;
+    /* flex-direction: column; */
+    flex-direction: column reverse;
+}
+
+.box{
+    border: 2px solid red;
+    height: 100px;
+    width: 100px;
+    font-size: 5em;
+    text-align: center;
+    border-radius: 50%;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.box:hover{
+    transform: scale(1.3);
+    box-shadow: 0 0 15px grey;
+}
+#box1{
+    background-image: url(https://thumbs.dreamstime.com/b/obesicat-garden-random-image-fat-pussy-cat-dressed-as-soccer-player-dutch-national-team-exercising-spring-87947898.jpg);
+    background-size: cover;
+}
+#box2{
+    background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmIcot3T43KsQ2LkAFevP0IA7ID-gXk0Fh2IbFfYudGQ&s=10);
+    background-size: cover;
+}
+#box3{
+    background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnUrCk0zZVFGRw3_JmKdYxzcsY0cSfxoTKRiLycavaRZxd4nE7VrzkR4Iv&s=10);
+    background-size: cover;
+}
+#box4{
+    background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIwVUyTYhgB-BQRsRh9OSrNjzXXFFADLbHBvoYnMG-9A&s=10);
+    background-size: cover;
+}
+#box5{
+    background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8Xk46QDKGB7Nx1-AP0OdVXqsB00Wy3Es3BNYnvnhEnWv1Xjb96XcEWRU&s=10);
+    background-size: cover;
+}

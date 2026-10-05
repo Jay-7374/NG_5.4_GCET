@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number</title>
+</head>
+<body>
+    <h2>Random Number Game</h2>
+    <h3 id="randomValue">Take a guess!</h3>
+    <input type="text" id="text1" placeholder="Enter your lucky number"/>
+    <button onclick="checkNumber()">check</button>
+
+    <script>
+        let randomNumber = Math.floor(Math.random() * 20);
+        console.log("random:", randomNumber);
+        let selectedNumber = document.getElementById("text1");
+        let randomValueElement = document.getElementById("randomValue");
+        function checkNumber() {
+            let userGuess = parseInt(selectedNumber.value);
+            if (userGuess === randomNumber) {
+                randomValueElement.textContent = "🎉 Correct! You are lucky!";
+            } else if (userGuess > randomNumber) {
+                randomValueElement.textContent = "Too high! Try a lower number.";
+            } else {
+                randomValueElement.textContent = "Too low! Try a higher number.";
+            }
+        }
+    </script>
+</body>
+</html>

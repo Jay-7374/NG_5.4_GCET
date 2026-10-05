@@ -1,0 +1,37 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Object</title>
+</head>
+<body>
+    <h1>JS Object Demo</h1>
+    <h2>Student Details</h2>
+    <script>
+        const students = [
+            {
+                name :"Jaya Prakash ",
+                email :"23r11a0544@gcet.edu.in",
+                age : 20
+            },
+            {
+                name :"Rishik ",
+                email :"23r11a0546@gcet.edu.in",
+                age : 19
+            },
+            {
+                name :" Abhiram ",
+                email :"23r11a0511@gcet.edu.in",
+                age : 21
+            }
+        ]
+        console.log(students);
+        for (let student of students) {
+            document.write("<br> Name:",student.name);
+            document.write("<br> Email:",student.email);
+            document.write("<br> Age:",student.age);
+            document.write("<br>");
+        }
+    </script>
+</body>
+</html>

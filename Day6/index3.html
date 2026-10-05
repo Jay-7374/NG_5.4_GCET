@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Plate & Palette | Discover a delicious meal</title>
+	<style>
+		:root {
+			--ink: #20231f;
+			--muted: #74776f;
+			--cream: #f7f4ed;
+			--paper: #fffdf9;
+			--tomato: #e6583d;
+			--tomato-dark: #b83e2e;
+			--sage: #dce5d5;
+			--line: #e7e1d7;
+			--shadow: 0 18px 45px rgba(59, 45, 29, .1);
+		}
+
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			color: var(--ink);
+			background: var(--cream);
+			font-family: Georgia, "Times New Roman", serif;
+		}
+		button, input, select { font: inherit; }
+		button { cursor: pointer; }
+		.page-shell { min-height: 100vh; overflow: hidden; }
+		header {
+			position: relative;
+			padding: 28px clamp(20px, 6vw, 92px) 48px;
+			background: var(--cream);
+		}
+		header::after {
+			content: "";
+			position: absolute;
+			width: 270px; height: 270px;
+			right: -75px; top: -100px;
+			border: 1px solid rgba(32,35,31,.14);
+			border-radius: 50%;
+			box-shadow: 0 0 0 24px rgba(32,35,31,.03), 0 0 0 48px rgba(32,35,31,.025);
+		}
+		.topbar, .hero, main { max-width: 1250px; margin: auto; }
+		.topbar { display: flex; justify-content: space-between; align-items: center; gap: 24px; position: relative; z-index: 1; }
+		.brand { font-size: 1.1rem; font-weight: bold; letter-spacing: .04em; }
+		.brand span { color: var(--tomato); }
+		.date { color: var(--muted); font: 12px Arial, sans-serif; text-transform: uppercase; letter-spacing: .13em; }
+		.view-nav { display: flex; gap: 7px; }
+		.view-tab { border: 1px solid rgba(32,35,31,.22); background: transparent; color: var(--ink); padding: 9px 12px; font: bold 11px Arial, sans-serif; letter-spacing: .07em; text-transform: uppercase; transition: .2s; }
+		.view-tab:hover, .view-tab.active { background: var(--ink); color: white; }
+		.view-tab span { display: inline-block; min-width: 17px; margin-left: 5px; color: var(--tomato); }
+		.view-tab.active span { color: #ffb1a4; }
+		.hero { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(250px, .9fr) minmax(430px, 1.1fr); gap: clamp(35px, 7vw, 110px); align-items: center; max-width: 1250px; padding-top: 68px; }
+		.eyebrow { color: var(--tomato-dark); font: bold 12px Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; }
+		h1 { max-width: 520px; margin: 14px 0 18px; font-size: clamp(3.5rem, 6.4vw, 6.3rem); line-height: .88; letter-spacing: -.055em; font-weight: 500; }
+		.hero p { max-width: 500px; color: #51574e; font-size: 1.15rem; line-height: 1.5; margin: 0; }
+		.featured-recipe { position: relative; min-height: 455px; display: grid; grid-template-columns: .85fr 1.15fr; align-items: end; overflow: hidden; background: var(--sage); box-shadow: var(--shadow); }
+		.featured-copy { position: relative; z-index: 1; padding: 38px 0 42px 38px; }
+		.featured-copy h2 { max-width: 310px; margin: 9px 0 17px; font-size: clamp(2.4rem, 4vw, 4.7rem); line-height: .9; letter-spacing: -.05em; font-weight: 500; }
+		.featured-copy p { max-width: 260px; margin: 0 0 24px; color: #51574e; font: 13px/1.55 Arial, sans-serif; }
+		.featured-stats { display: flex; gap: 22px; margin-bottom: 25px; }
+		.featured-stats strong { display: block; font: bold 14px Arial, sans-serif; }
+		.featured-stats span { color: var(--muted); font: 10px Arial, sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+		.featured-action { border: 0; background: var(--tomato); color: white; padding: 13px 18px; font: bold 11px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; transition: transform .2s, background .2s; }
+		.featured-action:hover { background: var(--tomato-dark); transform: translateY(-3px); }
+		.featured-visual { align-self: stretch; min-height: 455px; position: relative; overflow: hidden; }
+		.featured-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--sage) 0%, transparent 23%); pointer-events: none; }
+		.featured-visual img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform .8s ease; }
+		.featured-recipe:hover .featured-visual img { transform: scale(1.04); }
+		.featured-label { position: absolute; z-index: 1; top: 24px; right: 24px; padding: 8px 10px; background: rgba(255,253,249,.9); color: var(--tomato-dark); font: bold 10px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+		main { position: relative; z-index: 2; padding: 20px 24px 70px; }
+		.toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 14px; background: var(--paper); box-shadow: var(--shadow); }
+		.recipe-rail { max-width: 1250px; margin: 0 auto 18px; padding: 0 24px; }
+		.recipe-rail-head { display: flex; justify-content: space-between; align-items: baseline; padding: 28px 0 14px; }
+		.recipe-rail-head h2 { margin: 0; font-size: 1.45rem; font-weight: 500; }
+		.recipe-rail-head span { color: var(--muted); font: 10px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+		.recipe-rail-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+		.rail-item { display: grid; grid-template-columns: 74px 1fr; gap: 12px; align-items: center; min-width: 0; padding: 10px; background: var(--paper); border: 1px solid transparent; transition: border-color .2s, transform .2s; cursor: pointer; }
+		.rail-item:hover { border-color: var(--tomato); transform: translateY(-3px); }
+		.rail-item img { width: 74px; height: 74px; object-fit: cover; border-radius: 50%; }
+		.rail-item strong { display: -webkit-box; overflow: hidden; color: var(--ink); font-size: 1rem; line-height: 1.05; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+		.rail-item span { display: block; margin-top: 6px; color: var(--tomato-dark); font: 10px Arial, sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+		.search-wrap { flex: 1 1 280px; position: relative; }
+		.search-wrap input { width: 100%; border: 1px solid var(--line); background: #fff; padding: 15px 17px 15px 46px; outline: none; color: var(--ink); }
+		.search-wrap input:focus { border-color: var(--tomato); }
+		.search-icon { position: absolute; left: 16px; top: 13px; font: 20px Arial, sans-serif; color: var(--tomato); }
+		select { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 15px 32px 15px 14px; min-width: 145px; outline: none; }
+		select:focus { border-color: var(--tomato); }
+		.clear-btn { border: 0; background: var(--ink); color: white; padding: 15px 17px; }
+		.results-line { display: flex; justify-content: space-between; gap: 20px; align-items: baseline; padding: 46px 0 20px; }
+		.results-line h2 { margin: 0; font-size: 2rem; font-weight: 500; }
+		#resultCount { color: var(--muted); font: 12px Arial, sans-serif; text-transform: uppercase; letter-spacing: .1em; }
+		.meal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 26px; }
+		.meal-card { background: var(--paper); overflow: hidden; box-shadow: 0 6px 24px rgba(59,45,29,.06); transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease; animation: rise .5s both; }
+		.meal-card:hover { transform: translateY(-9px) rotate(-.35deg); box-shadow: 0 24px 45px rgba(59,45,29,.17); }
+		.meal-media { position: relative; overflow: hidden; aspect-ratio: 1 / .86; background: #20231f; }
+		.meal-image, .video-preview { display: block; width: 100%; height: 100%; object-fit: cover; }
+		.meal-image { transition: transform .65s cubic-bezier(.2,.8,.2,1), opacity .35s ease; }
+		.meal-card:hover .meal-image { transform: scale(1.08); }
+		.video-preview { position: absolute; inset: 0; border: 0; opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+		.meal-card.is-playing .video-preview { opacity: 1; }
+		.video-badge { position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 7px; padding: 7px 9px; color: white; background: rgba(32,35,31,.78); backdrop-filter: blur(5px); font: bold 10px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; transition: opacity .3s ease; }
+		.video-badge::before { content: "▶"; color: #ff6450; font-size: 11px; }
+		.meal-card.is-playing .video-badge { opacity: 0; }
+		.favorite-btn { position: absolute; top: 13px; right: 13px; z-index: 2; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255,253,249,.9); color: var(--ink); font-size: 19px; line-height: 1; box-shadow: 0 4px 15px rgba(0,0,0,.13); transition: transform .2s, color .2s, background .2s; }
+		.favorite-btn:hover { transform: scale(1.12); color: var(--tomato); }
+		.favorite-btn.is-favorite { background: var(--tomato); color: white; }
+		.empty-favorites { grid-column: 1 / -1; min-height: 300px; display: grid; place-content: center; padding: 40px; text-align: center; background: var(--paper); border: 1px dashed #d8d0c3; }
+		.empty-favorites .empty-heart { display: block; margin-bottom: 14px; color: var(--tomato); font-size: 3rem; }
+		.empty-favorites strong { display: block; margin-bottom: 8px; font-size: 1.5rem; font-weight: 500; }
+		.empty-favorites p { max-width: 360px; margin: 0 auto 20px; color: var(--muted); line-height: 1.5; }
+		.meal-copy { padding: 18px 18px 20px; }
+		.meal-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 13px; }
+		.tag { color: var(--tomato-dark); font: bold 10px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+		.meal-card h3 { margin: 0 0 17px; min-height: 2.5em; font-size: 1.4rem; line-height: 1.06; font-weight: 500; }
+		.view-btn { border: 1px solid var(--ink); background: transparent; color: var(--ink); padding: 9px 12px; font: bold 11px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; transition: .2s; }
+		.view-btn:hover { background: var(--ink); color: white; }
+		.state { grid-column: 1 / -1; padding: 70px 20px; text-align: center; color: var(--muted); }
+		.state strong { display: block; color: var(--ink); font-size: 1.5rem; margin-bottom: 8px; }
+		dialog { width: min(680px, calc(100% - 30px)); padding: 0; border: 0; background: var(--paper); color: var(--ink); box-shadow: 0 25px 80px rgba(0,0,0,.3); }
+		dialog::backdrop { background: rgba(25, 29, 24, .65); }
+		.modal-image { width: 100%; max-height: 330px; object-fit: cover; display: block; }
+		.modal-content { padding: 26px 30px 32px; }
+		.modal-content h2 { margin: 7px 0 12px; font-size: 2.2rem; font-weight: 500; }
+		.modal-content p { color: #55584f; line-height: 1.65; }
+		.close-modal { float: right; border: 0; background: transparent; font-size: 1.6rem; color: var(--muted); }
+		.modal-favorite { border: 1px solid var(--ink); background: transparent; color: var(--ink); padding: 10px 13px; font: bold 11px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; transition: .2s; }
+		.modal-favorite:hover, .modal-favorite.is-favorite { background: var(--tomato); border-color: var(--tomato); color: white; }
+		.source-link { color: var(--tomato-dark); font: bold 11px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+		@keyframes rise { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+		@media (max-width: 650px) {
+			header { padding-bottom: 72px; }
+			.date { display: none; }
+			.topbar { align-items: flex-start; }
+			.view-nav { flex-direction: column; gap: 5px; }
+			.view-tab { padding: 7px 9px; font-size: 10px; }
+			.hero { display: block; padding-top: 60px; }
+			.featured-recipe { margin-top: 38px; min-height: 0; display: flex; flex-direction: column-reverse; }
+			.featured-visual { min-height: 280px; width: 100%; }
+			.featured-copy { padding: 28px 25px 30px; }
+			.featured-copy h2 { max-width: 100%; font-size: 3rem; }
+			.recipe-rail { padding: 0 14px; }
+			.recipe-rail-list { display: flex; overflow-x: auto; padding-bottom: 7px; scroll-snap-type: x mandatory; }
+			.rail-item { flex: 0 0 250px; scroll-snap-align: start; }
+			main { padding: 0 14px 50px; }
+			.toolbar { padding: 10px; }
+			select, .clear-btn { flex: 1; min-width: 0; }
+			.results-line { padding-top: 34px; }
+			.results-line h2 { font-size: 1.6rem; }
+			.modal-content { padding: 20px; }
+			.meal-card:hover { transform: translateY(-4px); }
+		}
+	</style>
+</head>
+<body>
+	<div class="page-shell">
+		<header>
+			<div class="topbar">
+				<div class="brand">plate <span>&</span> palette</div>
+				<div class="date">A little inspiration for today</div>
+				<nav class="view-nav" aria-label="Recipe views">
+					<button class="view-tab active" id="allRecipesBtn" type="button">All recipes</button>
+					<button class="view-tab" id="favoritesBtn" type="button">Favorites <span id="favoriteCount">0</span></button>
+				</nav>
+			</div>
+			<div class="hero">
+				<div class="hero-intro">
+					<div class="eyebrow">The daily menu</div>
+					<h1>Find your next favorite dish.</h1>
+					<p>Browse recipes from around the world, then follow your appetite wherever it leads.</p>
+				</div>
+				<section class="featured-recipe" id="featuredRecipe" aria-label="Featured recipe">
+					<div class="featured-copy">
+						<div class="eyebrow" id="featuredMeta">Today's inspiration</div>
+						<h2 id="featuredTitle">Loading today's dish...</h2>
+						<p id="featuredDescription">A little inspiration for your next memorable meal.</p>
+						<div class="featured-stats">
+							<div><strong id="featuredCategory">--</strong><span>Category</span></div>
+							<div><strong id="featuredArea">--</strong><span>Cuisine</span></div>
+						</div>
+						<button class="featured-action" id="featuredButton" type="button">View recipe &rarr;</button>
+					</div>
+					<div class="featured-visual">
+						<span class="featured-label">Editor's pick</span>
+						<img id="featuredImage" src="" alt="Featured recipe" loading="eager">
+					</div>
+				</section>
+			</div>
+		</header>
+
+		<section class="recipe-rail" aria-label="More recipes">
+			<div class="recipe-rail-head"><h2>More from the table</h2><span>Fresh ideas, daily</span></div>
+			<div class="recipe-rail-list" id="recipeRailList"></div>
+		</section>
+
+		<main>
+			<section class="toolbar" aria-label="Meal filters">
+				<div class="search-wrap">
+					<span class="search-icon" aria-hidden="true">⌕</span>
+					<input id="searchInput" type="search" placeholder="Search meals..." aria-label="Search meals">
+				</div>
+				<select id="categoryFilter" aria-label="Filter by category"><option value="all">All categories</option></select>
+				<select id="areaFilter" aria-label="Filter by cuisine"><option value="all">All cuisines</option></select>
+				<select id="sortFilter" aria-label="Sort meals">
+					<option value="default">Sort: featured</option>
+					<option value="az">Name: A to Z</option>
+					<option value="za">Name: Z to A</option>
+				</select>
+				<button class="clear-btn" id="clearBtn" type="button">Reset</button>
+			</section>
+
+			<div class="results-line">
+				<h2 id="resultsTitle">Explore the table</h2>
+				<span id="resultCount">Loading recipes...</span>
+			</div>
+			<section id="mealGrid" class="meal-grid" aria-live="polite"></section>
+		</main>
+	</div>
+
+	<dialog id="mealDialog">
+		<img id="modalImage" class="modal-image" alt="">
+		<div class="modal-content">
+			<button class="close-modal" id="closeModal" type="button" aria-label="Close recipe">&times;</button>
+			<div id="modalTags" class="eyebrow"></div>
+			<h2 id="modalTitle"></h2>
+			<button class="modal-favorite" id="modalFavorite" type="button">&#9825; Save favorite</button>
+			<p id="modalInstructions"></p>
+			<a id="sourceLink" class="source-link" target="_blank" rel="noreferrer">Watch the recipe video &rarr;</a>
+		</div>
+	</dialog>
+
+	<script>
+		const apiUrl = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
+		let storedFavorites = [];
+		try { storedFavorites = JSON.parse(localStorage.getItem("platePaletteFavorites") || "[]"); } catch (error) { storedFavorites = []; }
+		const state = { meals: [], filtered: [], view: location.hash === "#favorites" && storedFavorites.length ? "favorites" : "all", favorites: new Set(storedFavorites) };
+		const grid = document.getElementById("mealGrid");
+		const searchInput = document.getElementById("searchInput");
+		const categoryFilter = document.getElementById("categoryFilter");
+		const areaFilter = document.getElementById("areaFilter");
+		const sortFilter = document.getElementById("sortFilter");
+		const resultCount = document.getElementById("resultCount");
+		const resultsTitle = document.getElementById("resultsTitle");
+		const allRecipesBtn = document.getElementById("allRecipesBtn");
+		const favoritesBtn = document.getElementById("favoritesBtn");
+		const favoriteCount = document.getElementById("favoriteCount");
+		const modalFavorite = document.getElementById("modalFavorite");
+		const dialog = document.getElementById("mealDialog");
+		const recipeRailList = document.getElementById("recipeRailList");
+		let featuredMeal = null;
+
+		function escapeHtml(value = "") {
+			return String(value ?? "").replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;" }[character]));
+		}
+
+		function populateFilters() {
+			const categories = [...new Set(state.meals.map(meal => meal.strCategory).filter(Boolean))].sort();
+			const areas = [...new Set(state.meals.map(meal => meal.strArea).filter(Boolean))].sort();
+			categories.forEach(category => categoryFilter.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`));
+			areas.forEach(area => areaFilter.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(area)}">${escapeHtml(area)}</option>`));
+		}
+
+		function renderFeatured() {
+			featuredMeal = state.meals[0];
+			if (!featuredMeal) return;
+			document.getElementById("featuredMeta").textContent = `${featuredMeal.strCategory || "Recipe"} / ${featuredMeal.strArea || "World kitchen"}`;
+			document.getElementById("featuredTitle").textContent = featuredMeal.strMeal;
+			document.getElementById("featuredDescription").textContent = (featuredMeal.strInstructions || "A little inspiration for your next memorable meal.").replace(/\s+/g, " ").slice(0, 145) + "...";
+			document.getElementById("featuredCategory").textContent = featuredMeal.strCategory || "Recipe";
+			document.getElementById("featuredArea").textContent = featuredMeal.strArea || "Global";
+			const image = document.getElementById("featuredImage");
+			image.src = featuredMeal.strMealThumb;
+			image.alt = featuredMeal.strMeal;
+		}
+
+		function renderRecipeRail() {
+			recipeRailList.innerHTML = state.meals.slice(1, 5).map(meal => `
+				<button class="rail-item" type="button" data-rail-id="${meal.idMeal}">
+					<img src="${meal.strMealThumb}" alt="${escapeHtml(meal.strMeal)}" loading="lazy">
+					<span><strong>${escapeHtml(meal.strMeal)}</strong>${escapeHtml(meal.strCategory || "Recipe")}</span>
+				</button>`).join("");
+		}
+
+		function renderMeals() {
+			const query = searchInput.value.trim().toLowerCase();
+			const category = categoryFilter.value;
+			const area = areaFilter.value;
+			const availableMeals = state.view === "favorites" ? state.meals.filter(meal => state.favorites.has(meal.idMeal)) : state.meals;
+			state.filtered = availableMeals.filter(meal => {
+				const matchesText = meal.strMeal.toLowerCase().includes(query);
+				return matchesText && (category === "all" || meal.strCategory === category) && (area === "all" || meal.strArea === area);
+			});
+			if (sortFilter.value !== "default") {
+				state.filtered.sort((first, second) => first.strMeal.localeCompare(second.strMeal) * (sortFilter.value === "za" ? -1 : 1));
+			}
+			resultsTitle.textContent = state.view === "favorites" ? "Your saved table" : "Explore the table";
+			favoriteCount.textContent = state.favorites.size;
+			allRecipesBtn.classList.toggle("active", state.view === "all");
+			favoritesBtn.classList.toggle("active", state.view === "favorites");
+			resultCount.textContent = `${state.filtered.length} recipe${state.filtered.length === 1 ? "" : "s"} found`;
+			if (!state.filtered.length) {
+				grid.innerHTML = state.view === "favorites"
+					? '<div class="empty-favorites"><span class="empty-heart">&#9825;</span><strong>Your recipe book is waiting.</strong><p>Tap the heart on any recipe to save it here for your next cooking session.</p><button class="view-btn" id="browseRecipesBtn" type="button">Browse recipes</button></div>'
+					: '<div class="state"><strong>No recipes found</strong>Try a different search or clear the filters.</div>';
+				return;
+			}
+			grid.innerHTML = state.filtered.map((meal, index) => `
+				${(() => { const videoId = getYoutubeId(meal.strYoutube); return `
+				<article class="meal-card" style="animation-delay: ${Math.min(index, 8) * 45}ms">
+					<div class="meal-media">
+						<img class="meal-image" src="${meal.strMealThumb}" alt="${escapeHtml(meal.strMeal)}" loading="lazy">
+						<button class="favorite-btn ${state.favorites.has(meal.idMeal) ? "is-favorite" : ""}" type="button" data-favorite-id="${meal.idMeal}" aria-label="${state.favorites.has(meal.idMeal) ? "Remove from" : "Add to"} favorites">${state.favorites.has(meal.idMeal) ? "&#9829;" : "&#9825;"}</button>
+						${videoId ? `<iframe class="video-preview" title="${escapeHtml(meal.strMeal)} video preview" data-video-id="${videoId}" allow="autoplay; encrypted-media" loading="lazy"></iframe><span class="video-badge">Preview on hover</span>` : ""}
+					</div>
+					<div class="meal-copy">
+						<div class="meal-tags"><span class="tag">${escapeHtml(meal.strCategory)}</span><span class="tag">&middot; ${escapeHtml(meal.strArea)}</span></div>
+						<h3>${escapeHtml(meal.strMeal)}</h3>
+						<button class="view-btn" type="button" data-meal-id="${meal.idMeal}">View recipe</button>
+					</div>
+				</article>`; })()}
+			`).join("");
+			grid.querySelectorAll(".meal-card").forEach(card => {
+				const video = card.querySelector(".video-preview");
+				if (!video) return;
+				const startPreview = () => {
+					video.src = `https://www.youtube-nocookie.com/embed/${video.dataset.videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${video.dataset.videoId}&rel=0`;
+					card.classList.add("is-playing");
+				};
+				const stopPreview = () => {
+					video.src = "";
+					card.classList.remove("is-playing");
+				};
+				card.addEventListener("pointerenter", startPreview);
+				card.addEventListener("pointerleave", stopPreview);
+				card.addEventListener("focusin", startPreview);
+				card.addEventListener("focusout", event => { if (!card.contains(event.relatedTarget)) stopPreview(); });
+			});
+			const browseButton = document.getElementById("browseRecipesBtn");
+			if (browseButton) browseButton.addEventListener("click", () => setView("all"));
+		}
+
+		function getYoutubeId(url = "") {
+			const match = String(url).match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([^?&/]+)/i);
+			return match ? match[1] : "";
+		}
+
+		function updateModalFavorite() {
+			const isFavorite = state.favorites.has(modalFavorite.dataset.mealId);
+			modalFavorite.classList.toggle("is-favorite", isFavorite);
+			modalFavorite.innerHTML = isFavorite ? "&#9829; Saved to favorites" : "&#9825; Save favorite";
+		}
+
+		function toggleFavorite(mealId) {
+			if (state.favorites.has(mealId)) state.favorites.delete(mealId);
+			else state.favorites.add(mealId);
+			localStorage.setItem("platePaletteFavorites", JSON.stringify([...state.favorites]));
+			favoriteCount.textContent = state.favorites.size;
+			updateModalFavorite();
+			renderMeals();
+		}
+
+		function setView(view) {
+			state.view = view;
+			searchInput.value = "";
+			categoryFilter.value = "all";
+			areaFilter.value = "all";
+			sortFilter.value = "default";
+			location.hash = view === "favorites" ? "favorites" : "all";
+			renderMeals();
+		}
+
+		function showMeal(meal) {
+			document.getElementById("modalImage").src = meal.strMealThumb;
+			document.getElementById("modalImage").alt = meal.strMeal;
+			document.getElementById("modalTitle").textContent = meal.strMeal;
+			document.getElementById("modalTags").textContent = `${meal.strCategory} / ${meal.strArea}`;
+			document.getElementById("modalInstructions").textContent = meal.strInstructions || "Recipe instructions are not available for this meal.";
+			const sourceLink = document.getElementById("sourceLink");
+			sourceLink.href = meal.strYoutube || meal.strSource || "#";
+			sourceLink.style.display = meal.strYoutube || meal.strSource ? "inline-block" : "none";
+			modalFavorite.dataset.mealId = meal.idMeal;
+			updateModalFavorite();
+			dialog.showModal();
+		}
+
+		async function loadMeals() {
+			try {
+				const response = await fetch(apiUrl);
+				if (!response.ok) throw new Error("Request failed");
+				const data = await response.json();
+				state.meals = data.meals || [];
+				if (!state.meals.length) throw new Error("No meals returned");
+				populateFilters();
+				renderFeatured();
+				renderRecipeRail();
+				renderMeals();
+			} catch (error) {
+				resultCount.textContent = "Could not load recipes";
+				grid.innerHTML = '<div class="state"><strong>The kitchen is taking a moment</strong>Check your connection and refresh to try again.</div>';
+			}
+		}
+
+		[searchInput, categoryFilter, areaFilter, sortFilter].forEach(control => {
+			control.addEventListener("input", renderMeals);
+			control.addEventListener("search", renderMeals);
+		});
+		function resetFilters() {
+			searchInput.value = "";
+			categoryFilter.value = "all";
+			areaFilter.value = "all";
+			sortFilter.value = "default";
+			renderMeals();
+		}
+		document.getElementById("clearBtn").addEventListener("click", resetFilters);
+		grid.addEventListener("click", event => {
+			const favoriteButton = event.target.closest("[data-favorite-id]");
+			if (favoriteButton) {
+				event.stopPropagation();
+				toggleFavorite(favoriteButton.dataset.favoriteId);
+				return;
+			}
+			const button = event.target.closest("[data-meal-id]");
+			if (button) showMeal(state.meals.find(meal => meal.idMeal === button.dataset.mealId));
+		});
+		allRecipesBtn.addEventListener("click", () => setView("all"));
+		favoritesBtn.addEventListener("click", () => setView("favorites"));
+		modalFavorite.addEventListener("click", () => toggleFavorite(modalFavorite.dataset.mealId));
+		document.getElementById("featuredButton").addEventListener("click", () => { if (featuredMeal) showMeal(featuredMeal); });
+		recipeRailList.addEventListener("click", event => {
+			const railItem = event.target.closest("[data-rail-id]");
+			if (railItem) showMeal(state.meals.find(meal => meal.idMeal === railItem.dataset.railId));
+		});
+		window.addEventListener("hashchange", () => setView(location.hash === "#favorites" ? "favorites" : "all"));
+		document.getElementById("closeModal").addEventListener("click", () => dialog.close());
+		dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); });
+		loadMeals();
+	</script>
+</body>
+</html>
