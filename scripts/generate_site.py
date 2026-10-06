@@ -69,7 +69,8 @@ def folder_menu(folder: Path, html_files: list[Path]) -> None:
     )
     output_folder = SITE / folder.name
     output_folder.mkdir(parents=True, exist_ok=True)
-    generated_menu = page_shell(f"{display_name(folder)} | Training Menu", body)
+    generated_menu = page_shell(
+        f"{display_name(folder)} | Training Menu", body)
     for output_name in ("index.html", "menu.html"):
         (output_folder / output_name).write_text(generated_menu, encoding="utf-8")
 
